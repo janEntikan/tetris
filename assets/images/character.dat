@@ -1,0 +1,20 @@
+inca-up 32
+inca-up-shot 34 35 36
+inca-up-reload 64 65 66 67 68
+
+inca-middle 16
+inca-middle-shot 18 19 20
+inca-middle-reload 64 65 66 67 68
+
+inca-down 48
+inca-down-shot 50 51 52
+inca-down-reload 80 81 82 84
+
+inca-left 3 2 1 0
+inca-right 0 1 2 3
+inca-reload 0 1 0 1
+
+
+ninja-up 5
+ninja-middle 5
+ninja-down 5

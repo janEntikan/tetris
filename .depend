@@ -1,0 +1,25 @@
+main.o: /home/hj/TETRIS/src/main.cpp /home/hj/TETRIS/src/game/game.h \
+ /home/hj/TETRIS/src/game/../sdl/timer.h \
+ /home/hj/TETRIS/src/game/../sdl/window.h \
+ /home/hj/TETRIS/src/game/../sdl/input.h \
+ /home/hj/TETRIS/src/game/../sdl/texture.h \
+ /home/hj/TETRIS/src/game/../sdl/fileio.h \
+ /home/hj/TETRIS/src/game/pieces.h
+game.o: /home/hj/TETRIS/src/game/game.cpp /home/hj/TETRIS/src/game/game.h \
+ /home/hj/TETRIS/src/game/../sdl/timer.h \
+ /home/hj/TETRIS/src/game/../sdl/window.h \
+ /home/hj/TETRIS/src/game/../sdl/input.h \
+ /home/hj/TETRIS/src/game/../sdl/texture.h \
+ /home/hj/TETRIS/src/game/../sdl/fileio.h \
+ /home/hj/TETRIS/src/game/pieces.h
+pieces.o: /home/hj/TETRIS/src/game/pieces.cpp
+fileio.o: /home/hj/TETRIS/src/sdl/fileio.cpp \
+ /home/hj/TETRIS/src/sdl/fileio.h
+input.o: /home/hj/TETRIS/src/sdl/input.cpp \
+ /home/hj/TETRIS/src/sdl/input.h
+texture.o: /home/hj/TETRIS/src/sdl/texture.cpp \
+ /home/hj/TETRIS/src/sdl/texture.h /home/hj/TETRIS/src/sdl/fileio.h
+timer.o: /home/hj/TETRIS/src/sdl/timer.cpp \
+ /home/hj/TETRIS/src/sdl/timer.h
+window.o: /home/hj/TETRIS/src/sdl/window.cpp \
+ /home/hj/TETRIS/src/sdl/window.h
