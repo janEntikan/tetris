@@ -1,5 +1,5 @@
 CC = g++
-CC_FLAGS = -w -g
+CXXFLAGS = -w -g
 
 PROJDIR = $(CURDIR)
 SOURCEDIR = $(PROJDIR)/src
@@ -18,10 +18,7 @@ all : build
 build: $(PRGM)
 
 $(PRGM): $(O_FILES)
-	$(CC) $(CC_FLAGS) -o $(PRGM) $(O_FILES) $(LIBS_NAME) $(LIBS_PATH)
-
-%.o: %.c %.h
-	$(CC) $(CC_FLAGS) -c $<
+	$(CC) $(CXXFLAGS) -o $(PRGM) $(O_FILES) $(LIBS_NAME) $(LIBS_PATH)
 
 .depend:
 	$(CC) -MM $(CPP_FILES) > $@
