@@ -20,14 +20,23 @@ private:
   Timer cap_timer;
   int board[20][10];
   Pieces pieces;
-  int piece;
+  int level;
+  double x_time;
+  double x_hold;
+  int y_time;
   int location[2];
-  int rotation;
+
   void new_piece();
+  void apply_piece();
   void clear_board();
+  void rotate_piece();
+  void move_piece();
+  void hittest();
+  void linetest();
+
   void update();
   void draw();
-  void delay();
+  void wait();
   void end();
 };
 

@@ -2,18 +2,13 @@
 
 Input::Input() {
 	binds = {
-		{"up", SDL_SCANCODE_W},
-		{"down", SDL_SCANCODE_S},
-		{"left", SDL_SCANCODE_A},
-		{"right",SDL_SCANCODE_D},
-		{"shoot_up", SDL_SCANCODE_UP},
-		{"shoot_down", SDL_SCANCODE_DOWN},
-		{"shoot_middle", SDL_SCANCODE_RIGHT},
-		{"e", SDL_SCANCODE_E},
-		{"f", SDL_SCANCODE_F},
-		{"enter", SDL_SCANCODE_RETURN},
-		{"space", SDL_SCANCODE_SPACE},
-		{"quit", SDL_SCANCODE_ESCAPE},
+		{"up", SDL_SCANCODE_UP},
+		{"down", SDL_SCANCODE_DOWN},
+		{"left", SDL_SCANCODE_LEFT},
+		{"right",SDL_SCANCODE_RIGHT},
+		{"rotate_l", SDL_SCANCODE_Z},
+		{"rotate_r", SDL_SCANCODE_X},
+    {"quit", SDL_SCANCODE_ESCAPE},
 	};
 
 	for (auto& bind : binds) {

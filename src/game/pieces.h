@@ -58,6 +58,11 @@ public:
         0,0,0,0,0,
       },
     };
-
-    void get_random_piece();
+    int current_piece[5][5]; 
+    int transformed_piece[5][5];
+    void transpose();
+    void flip_rows();
+    void flip_collumns();
+    void apply_transform();
+    void copy(int);
 };
