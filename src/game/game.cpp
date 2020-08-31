@@ -1,5 +1,6 @@
 #include "game.h"
 #include <algorithm>
+#include <stdlib.h>
 
 SDL_Rect DRAW_RECT = { 0, 0, 8, 8 };
 
@@ -14,8 +15,9 @@ Game::Game() {
   clear_board();
   new_piece();
   level = 1;
-  x_time = 10;
-  y_time = 10;
+  x_time = 0;
+  y_time = 0;
+  drop_time = 10;
   x_hold = 1;
   while (input.keys["quit"] == 0){
 		update();
@@ -34,7 +36,8 @@ void Game::clear_board() {
 void Game::new_piece() {
   location[0] = 3;
   location[1] = 0;
-  pieces.copy(1); //make random/tetris alg
+  pieces.copy(rand()%7); //make random/tetris alg
+  x_time = 0;
 }
 
 void Game::apply_piece() {
@@ -52,76 +55,136 @@ void Game::apply_piece() {
 }
 
 void Game::rotate_piece() {
-  if (input.keys["rotate_l"] == 2) {
+  if (input.keys["rotate_r"] == 2) {
     pieces.flip_rows();
     pieces.transpose();
-  } else if (input.keys["rotate_r"] == 2) {
+    x_hold = 1;
+  } else if (input.keys["rotate_l"] == 2) {
     pieces.transpose();
     pieces.flip_rows();
+    x_hold = 1;
   }
 }
 
-void Game::move_piece() {
-  //X
-  // increment x_hold each cycle move key is held
-  x_time -= x_hold;
-  if (x_time < 0) {
-    x_time = 5; 
-    if (input.keys["left"]) {
-      location[0] -= 1;
-      x_hold += 0.5;
-    } else if (input.keys["right"]) {
-      location[0] += 1;
-      x_hold += 0.5;
-    } else if (input.keys["down"]) {
+void Game::keyhold() {
+  x_hold += 0.25;
+  x_time = 8;
+}
+
+void Game::move_down() {
+  y_time -= 1;
+  if (y_time < 0) {
+    if (input.keys["down"]) {
+      y_time = 2;
       location[1] += 1;
-      x_hold += 0.5;    
-    }else {
-      x_time = 5;
-      x_hold = 1;
+      return;
     }
   }
-  //Y
-  y_time -= level;
-  if (y_time < 0) {
-    y_time = 30;
+  drop_time -= level;
+  if (drop_time < 0) {
+    drop_time = 30;
     location[1] += 1;
   }
 }
 
-void Game::hittest() {
+void Game::move_side() {
+  x_time -= x_hold;
+  prev_x = location[0];
+  if (x_time < 0) {
+    if (input.keys["left"]) {
+      location[0] -= 1;
+      keyhold();
+    } else if (input.keys["right"]) {
+      location[0] += 1;
+      keyhold();
+   } else {
+      x_time = 0;
+      x_hold = 1;
+    }
+  }
+  if (hittest() or out_of_bounds()) {
+    location[0] = prev_x;
+  }
+
+}
+
+void Game::move_piece() {
+  move_side();
+  move_down();  
+  if (hittest()) {
+    apply_piece();
+    new_piece();  
+  }
+  // HITTEST PIECE WITH BOARD CONTENT
+  // IF HITTEST WITH Y AT 0, GAME OVER
+  // ELSE NEW PIECE IF HIT 
+}
+
+// See if piece is outside of board
+bool Game::out_of_bounds() {
+  for (int y=0;y<5;y++) {
+    for (int x=0;x<5;x++) {
+      int bx = x+location[0];
+      int by = y+location[1];
+      int val = pieces.current_piece[y][x];
+      if (val) {
+        if ((bx < 0) or (bx >= 10)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+// See if piece is touching board
+bool Game::hittest() {
   for (int y=0;y<5;y++) {
     for (int x=0;x<5;x++) {
       int bx = x+location[0];
       int by = y+location[1];
       int val = pieces.current_piece[y][x];
       if (val){
-        // HITTEST PIECE WITH BOARD WIDTH
-        while (bx < 0) {
-          bx = x+location[0];
-          location[0] += 1;
-        } 
-        while (bx >= 10) {
-          bx = x+location[0];
-          location[0] -= 1;
-        }
-
-
         if ((by >= 20) or (board[by][bx] > 0)) {
-          apply_piece();
-          new_piece();
-          return;
+          return true;
         }
       }
     }
-  }  
-  // HITTEST PIECE WITH BOARD CONTENT
-  // IF HITTEST WITH BOARD AT CEILING, GAME OVER
-  // NEW PIECE IF HIT 
+  }
+  return false;
+} 
+
+bool Game::line_is_full(int y) {
+  for (int x = 0; x < 10; x++) {
+    int tile = board[y][x];
+    if (tile == 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
+
+void Game::remove_line(int y) {
+  for (int i = y; i > 0; i--) {
+    for (int x = 0; x < 10; x++) {
+      if (i==0) {
+        board[i][x] = 0;
+      } else {
+        board[i][x] = board[i-1][x];
+      }
+    } 
+  }
+}
+
+
 void Game::linetest() {
-  // CHECK IF ANY LINES ARE COMPLETED (COULD PLAY ANIMATION?)
+  // CHECK IF ANY LINES ARE COMPLETED (PLAY ANIMATION?)
+  for (int y = 0; y < 20; y++) {
+    if (line_is_full(y)) {
+      remove_line(y);
+    }
+  }
 }
 
 void Game::update() {
@@ -129,13 +192,15 @@ void Game::update() {
   input.read_input();
   rotate_piece();
   move_piece();
-  hittest();
   linetest();
   draw();
   wait();
 }
 
-void Game::draw() {  
+void Game::draw() {
+  int piece_size = 8;  //in pixels
+  DRAW_RECT.w = piece_size;
+  DRAW_RECT.h = piece_size;
   // DRAW STUFF
   SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
   SDL_RenderClear(window.renderer);
@@ -145,8 +210,8 @@ void Game::draw() {
   for (int y=0;y<20;y++) {
     for (int x=0;x<10;x++) {
       if (board[y][x] > 0) {
-        DRAW_RECT.x = x*8;
-        DRAW_RECT.y = y*8;
+        DRAW_RECT.x = x*piece_size;
+        DRAW_RECT.y = y*piece_size;
         SDL_RenderFillRect(window.renderer, &DRAW_RECT);
       }
     }
@@ -157,8 +222,8 @@ void Game::draw() {
   for (int y=0;y<5;y++) {
     for (int x=0;x<5;x++) {
       if (pieces.current_piece[y][x] > 0) {
-        DRAW_RECT.x = (location[0] + x)*8;
-        DRAW_RECT.y = (location[1] + y)*8;
+        DRAW_RECT.x = (location[0] + x)*piece_size;
+        DRAW_RECT.y = (location[1] + y)*piece_size;
         SDL_RenderFillRect(window.renderer, &DRAW_RECT); 
       }
     }
