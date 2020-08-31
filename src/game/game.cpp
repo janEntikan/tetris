@@ -198,20 +198,41 @@ void Game::update() {
 }
 
 void Game::draw() {
-  int piece_size = 8;  //in pixels
-  DRAW_RECT.w = piece_size;
-  DRAW_RECT.h = piece_size;
+
+
+
   // DRAW STUFF
+
   SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
   SDL_RenderClear(window.renderer);
-  
+
+  int frame_x = 42;
+  int frame_y = 8;
+  int piece_size = 8; //in pixels
+  // DRAW FRAME
+  SDL_SetRenderDrawColor(window.renderer, 0x22, 0x22, 0x22, 0xFF);
+  DRAW_RECT.w = 12*piece_size;
+  DRAW_RECT.h = 22*piece_size;
+  DRAW_RECT.x = frame_x-piece_size;
+  DRAW_RECT.y = frame_y-piece_size;
+  SDL_RenderFillRect(window.renderer, &DRAW_RECT);
+  // DRAW FIELD
+  SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
+  DRAW_RECT.w = 10*piece_size;
+  DRAW_RECT.h = 20*piece_size;
+  DRAW_RECT.x = frame_x;
+  DRAW_RECT.y = frame_y;
+  SDL_RenderFillRect(window.renderer, &DRAW_RECT);
+
+  DRAW_RECT.w = piece_size;
+  DRAW_RECT.h = piece_size;
   //  DRAW BOARD
   SDL_SetRenderDrawColor(window.renderer, 0xFF, 0x00, 0xFF, 0xFF);
   for (int y=0;y<20;y++) {
     for (int x=0;x<10;x++) {
       if (board[y][x] > 0) {
-        DRAW_RECT.x = x*piece_size;
-        DRAW_RECT.y = y*piece_size;
+        DRAW_RECT.x = frame_x+(x*piece_size);
+        DRAW_RECT.y = frame_y+(y*piece_size);
         SDL_RenderFillRect(window.renderer, &DRAW_RECT);
       }
     }
@@ -222,8 +243,8 @@ void Game::draw() {
   for (int y=0;y<5;y++) {
     for (int x=0;x<5;x++) {
       if (pieces.current_piece[y][x] > 0) {
-        DRAW_RECT.x = (location[0] + x)*piece_size;
-        DRAW_RECT.y = (location[1] + y)*piece_size;
+        DRAW_RECT.x = frame_x+((location[0] + x)*piece_size);
+        DRAW_RECT.y = frame_y+((location[1] + y)*piece_size);
         SDL_RenderFillRect(window.renderer, &DRAW_RECT); 
       }
     }
