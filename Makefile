@@ -7,7 +7,7 @@ CPP_FILES := $(wildcard $(SOURCEDIR)/*.cpp $(SOURCEDIR)/*/*.cpp)
 O_FILES = $(CPP_FILES:.cpp=.o)
 H_FILES = $(CPP_FILES:.cpp=.h)
 
-LIBS_NAME = -lSDL2 -lSDL2_image
+LIBS_NAME = -lSDL2 
 LIBS_PATH = 
 
 PRGM = supertris

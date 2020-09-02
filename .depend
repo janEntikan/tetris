@@ -2,24 +2,17 @@ main.o: /home/hj/tetris/src/main.cpp /home/hj/tetris/src/game/game.h \
  /home/hj/tetris/src/game/../sdl/timer.h \
  /home/hj/tetris/src/game/../sdl/window.h \
  /home/hj/tetris/src/game/../sdl/input.h \
- /home/hj/tetris/src/game/../sdl/texture.h \
- /home/hj/tetris/src/game/../sdl/fileio.h \
- /home/hj/tetris/src/game/pieces.h
+ /home/hj/tetris/src/game/pieces.h /home/hj/tetris/src/game/text.h
 game.o: /home/hj/tetris/src/game/game.cpp /home/hj/tetris/src/game/game.h \
  /home/hj/tetris/src/game/../sdl/timer.h \
  /home/hj/tetris/src/game/../sdl/window.h \
  /home/hj/tetris/src/game/../sdl/input.h \
- /home/hj/tetris/src/game/../sdl/texture.h \
- /home/hj/tetris/src/game/../sdl/fileio.h \
- /home/hj/tetris/src/game/pieces.h
+ /home/hj/tetris/src/game/pieces.h /home/hj/tetris/src/game/text.h
 pieces.o: /home/hj/tetris/src/game/pieces.cpp \
  /home/hj/tetris/src/game/pieces.h
-fileio.o: /home/hj/tetris/src/sdl/fileio.cpp \
- /home/hj/tetris/src/sdl/fileio.h
+text.o: /home/hj/tetris/src/game/text.cpp /home/hj/tetris/src/game/text.h
 input.o: /home/hj/tetris/src/sdl/input.cpp \
  /home/hj/tetris/src/sdl/input.h
-texture.o: /home/hj/tetris/src/sdl/texture.cpp \
- /home/hj/tetris/src/sdl/texture.h /home/hj/tetris/src/sdl/fileio.h
 timer.o: /home/hj/tetris/src/sdl/timer.cpp \
  /home/hj/tetris/src/sdl/timer.h
 window.o: /home/hj/tetris/src/sdl/window.cpp \

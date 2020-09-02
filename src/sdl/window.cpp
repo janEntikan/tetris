@@ -32,13 +32,7 @@ bool Window::initialize() {
         SDL_Log("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
         return false;
     }	
-    SDL_RenderSetScale(renderer, w/(8*20), h/(8*20));
-
-    int img_flags = IMG_INIT_PNG;
-    if (!(IMG_Init( img_flags ) & img_flags)) {
-        SDL_Log("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-        return false;
-    }
+    SDL_RenderSetScale(renderer, w/(8*30), h/(8*20));
     return true;
 }
 
@@ -53,6 +47,5 @@ void Window::clear() {
 void Window::destroy() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    IMG_Quit();
     SDL_Quit();
 }

@@ -1,3 +1,5 @@
+#ifndef PIECES
+#define PIECES
 
 class Pieces {
 public:
@@ -66,3 +68,6 @@ public:
     void apply_transform();
     void copy(int);
 };
+
+#endif
+
