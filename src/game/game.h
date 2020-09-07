@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include <stdlib.h>
+#include <numeric>
 #include <vector>
 #include <map>
 #include <filesystem>
@@ -24,6 +25,20 @@ private:
   int score;
   int combo;
   int lines;
+  bool falling;
+  std::vector<int> upcoming;
+  unsigned char colors[9][3] = {
+    0xFF, 0x00, 0xFF,
+    0x00, 0x00, 0xFF,
+    0x00, 0xFF, 0xFF,
+    0x00, 0xFF, 0x00,
+    0xFF, 0xFF, 0x00,
+    0xFF, 0x00, 0x00,
+    0x55, 0x00, 0x55,
+    0x00, 0x00, 0x55,
+    0x55, 0x00, 0x00,
+  };
+  
 
   double x_time;
   double x_hold;
@@ -46,10 +61,13 @@ private:
   bool line_is_full(int);
   void linetest();
   void remove_line(int);
+  void animate_line(std::vector <int>);
+  void move();
+  
 
   void update();
   void draw();
-  void wait();
+  void wait(int);
   void end();
 };
 

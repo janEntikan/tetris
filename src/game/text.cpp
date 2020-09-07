@@ -11,7 +11,7 @@ void Text::print(SDL_Renderer* renderer,  std::string string, int x, int y) {
   for (auto& string_letter : string) {
     alphabet_index = 0;
     alphabet_index = alphabet.find_first_of(string_letter);
-    for (int cy = 0; cy<4; cy++) {
+    for (int cy = 0; cy<5; cy++) {
       for (int cx = 0; cx<5; cx++) {
         if (chars[alphabet_index][cy][cx] == 1) {
           draw_rect.x = (x+cx); 
