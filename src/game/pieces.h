@@ -60,6 +60,7 @@ public:
         0,0,0,0,0,
       },
     };
+
     int current_piece[5][5]; 
     int transformed_piece[5][5];
     void transpose();

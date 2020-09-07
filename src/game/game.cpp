@@ -51,6 +51,7 @@ void Game::new_piece() {
 
 void Game::apply_piece() {
   location[1] -= 1;
+  score++;
   for (int y=0;y<5;y++) {
     for (int x=0;x<5;x++) {
       int val = pieces.current_piece[y][x];
@@ -75,13 +76,16 @@ void Game::rotate_piece() {
     pieces.flip_rows();
     x_hold = 1;
   }
-
-  // Push piece away if rotated out of bounds
-  while (out_of_bounds() == -1) {
-    location[0] -= 1;
-  }
-  while (out_of_bounds() == 1) {
-    location[0] += 1;
+  if (out_of_bounds() or hittest()){
+    if (input.keys["rotate_l"] == 2) {
+      pieces.flip_rows();
+      pieces.transpose();
+      x_hold = 1;
+    } else if (input.keys["rotate_r"] == 2) {
+      pieces.transpose();
+      pieces.flip_rows();
+      x_hold = 1;
+    }
   }
 }
 
@@ -134,7 +138,7 @@ void Game::move_piece() {
   if (hittest()) {
     apply_piece();
     new_piece();  
-  }
+  } 
 }
 
 // is piece outside of board
@@ -156,7 +160,7 @@ int Game::out_of_bounds() {
   return 0;
 }
 
-// is piece is touching board
+// piece is touching board
 bool Game::hittest() {
   for (int y=0;y<5;y++) {
     for (int x=0;x<5;x++) {
@@ -199,11 +203,28 @@ void Game::remove_line(int y) {
 
 void Game::linetest() {
   // CHECK IF ANY LINES ARE COMPLETED (PLAY ANIMATION?)
+  int lines_checked = 0;
+  int accumulated_score = 0;
   for (int y = 0; y < 20; y++) {
     if (line_is_full(y)) {
+      lines++;
+      lines_checked++;
       remove_line(y);
     }
   }
+  if (lines_checked > 0) { 
+    accumulated_score += lines_checked * 5 * 10;
+    if (lines_checked == 4) {
+      combo += 1;
+      accumulated_score *= combo;
+    } else {
+      combo = 0;
+    }
+    while (lines > level*10) {
+      level ++;
+    }  
+  }
+  score += accumulated_score;
 }
 
 void Game::update() {
@@ -220,11 +241,9 @@ void Game::draw() {
   int frame_x = 80;
   int frame_y = 8;
   int block_size = 8; //in pixels
-
   // DRAW STUFF
   SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
   SDL_RenderClear(window.renderer);
-
   // DRAW FRAME
   SDL_SetRenderDrawColor(window.renderer, 0x22, 0x22, 0x22, 0xFF);
   DRAW_RECT.w = 12*block_size;
@@ -239,7 +258,6 @@ void Game::draw() {
   DRAW_RECT.x = frame_x;
   DRAW_RECT.y = frame_y;
   SDL_RenderFillRect(window.renderer, &DRAW_RECT);
-
   DRAW_RECT.w = block_size;
   DRAW_RECT.h = block_size;
   //  DRAW BOARD
@@ -270,13 +288,14 @@ void Game::draw() {
 
   // DRAW TEXT
   int text_x = frame_x+(10*block_size)+block_size+2;
-  text.print(window.renderer, "score:", text_x, frame_y);
-  text.print(window.renderer, "level:", text_x, frame_y+6);
-  text.print(window.renderer, "combo:", text_x, frame_y+12);
-  text.print(window.renderer, "lines:", text_x, frame_y+18);
-  
-  //text.print(window.renderer, (char*) score, text_x+30, frame_y);
-  
+  text.print(window.renderer, "score-", text_x, frame_y);
+  text.print(window.renderer, std::to_string(score), text_x+35, frame_y);
+  text.print(window.renderer, "level-", text_x, frame_y+6);
+  text.print(window.renderer, std::to_string(level), text_x+35, frame_y+6);
+  text.print(window.renderer, "combo-", text_x, frame_y+12);
+  text.print(window.renderer, std::to_string(combo), text_x+35, frame_y+12);
+  text.print(window.renderer, "lines-", text_x, frame_y+18);
+  text.print(window.renderer, std::to_string(lines), text_x+35, frame_y+18);
   window.flip();
 }
 

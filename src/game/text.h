@@ -6,7 +6,7 @@
 
 class Text{
 public:
-  std::string alphabet = " abcdefghijklmnopqrstuvwxyz01234567890:";
+  std::string alphabet = " abcdefghijklmnopqrstuvwxyz1234567890-";
   
   int chars[38][4][5] = {
     { //space
@@ -267,8 +267,8 @@ public:
       1,0,1,0,0,
       1,1,1,0,0,
     },
-    
-    { // :
+
+    { //- 
       0,0,0,0,0,
       0,1,0,0,0,
       0,0,0,0,0,
