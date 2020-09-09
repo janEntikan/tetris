@@ -27,6 +27,7 @@ private:
   int lines;
   bool falling;
   std::vector<int> upcoming;
+  int next;
   unsigned char colors[9][3] = {
     0xFF, 0x00, 0xFF,
     0x00, 0x00, 0xFF,
@@ -64,8 +65,9 @@ private:
   void animate_line(std::vector <int>);
   void move();
   
-
+  void menu();
   void update();
+  void draw_frame();
   void draw();
   void wait(int);
   void end();

@@ -2,7 +2,18 @@
 #include <algorithm>
 #include <stdlib.h>
 
+
+int FRAME_X = 80;
+int FRAME_Y = 8;
+int BLOCK_SIZE = 8; //in pixels
 SDL_Rect DRAW_RECT = { 0, 0, 8, 8 };
+int TITLE[5][32] = {
+  1,1,1,0,0,1,1,1,0,0,0,1,1,1,0,1,1,1,1,0,1,1,1,0,0,1,1,0,0,1,1,1,
+  1,1,0,1,0,1,1,0,1,0,1,1,0,0,0,0,1,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,
+  1,1,1,1,0,1,1,1,0,0,1,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,0,
+  1,1,0,0,0,1,1,0,1,0,1,1,0,0,0,0,1,1,0,0,1,1,0,1,0,1,1,0,0,0,1,1,
+  1,1,0,0,0,1,1,0,1,0,0,1,1,1,0,0,1,1,0,0,1,1,0,1,0,1,1,0,1,1,1,0,
+};
 
 Game::Game() {
 	char* title =  (char*)"inca 2000";
@@ -13,10 +24,20 @@ Game::Game() {
   input = Input();
   pieces = Pieces();
   new_game();
+  while (input.keys["down"] == 0){
+    menu();
+  }
   while (input.keys["quit"] == 0){
 		update();
 	}
 	//TODO: destroy everything
+}
+
+void Game::wait(int framerate) {
+  int frame_ticks = cap_timer.get_ticks();
+  if (frame_ticks < 1000/framerate) {
+    SDL_Delay(1000/framerate - frame_ticks);
+  }
 }
 
 void Game::new_game() {
@@ -30,7 +51,8 @@ void Game::new_game() {
   combo = 0;
   lines = 0;
   clear_board();
- 
+
+  next = rand()%7; 
   upcoming = {0,1,2,3,4,5,6};
   std::random_shuffle (upcoming.begin(), upcoming.end()); 
 
@@ -49,12 +71,13 @@ void Game::new_piece() {
 
   location[0] = 3;
   location[1] = -3;
-  int p = upcoming.front();
+
+  pieces.copy(next);
+  next = upcoming.front();
   upcoming.erase(upcoming.begin());
-  pieces.copy(p);
-  
+
   if (upcoming.size() == 1) {
-    p = upcoming.front();
+    next = upcoming.front();
     upcoming = {0,1,2,3,4,5,6};
     std::random_shuffle(upcoming.begin(), upcoming.end());
   }
@@ -150,6 +173,10 @@ void Game::move_piece() {
   move_side();
   move_down();  
   if (hittest()) {
+    if (location[1] < 1) {
+      new_game();
+      return;
+    } 
     apply_piece();
     new_piece();  
   } 
@@ -230,7 +257,6 @@ void Game::animate_line(std::vector<int> lines) {
   }
 }
 
-
 void Game::linetest() {
   // CHECK IF ANY LINES ARE COMPLETED (PLAY ANIMATION?)
   std::vector<int> lines_checked = {};
@@ -279,37 +305,48 @@ void Game::update() {
   wait(60);
 }
 
-void Game::draw() {
-  int frame_x = 80;
-  int frame_y = 8;
-  int block_size = 8; //in pixels
+void Game::draw_frame() {
   // CLEAR
   SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
   SDL_RenderClear(window.renderer);
   // DRAW FRAME
   SDL_SetRenderDrawColor(window.renderer, 0x22, 0x22, 0x22, 0xFF);
-  DRAW_RECT.w = 12*block_size;
-  DRAW_RECT.h = 22*block_size;
-  DRAW_RECT.x = frame_x-block_size;
-  DRAW_RECT.y = frame_y-block_size;
+  DRAW_RECT.w = 12*BLOCK_SIZE;
+  DRAW_RECT.h = 22*BLOCK_SIZE;
+  DRAW_RECT.x = FRAME_X-BLOCK_SIZE;
+  DRAW_RECT.y = FRAME_Y-BLOCK_SIZE;
   SDL_RenderFillRect(window.renderer, &DRAW_RECT);
   // DRAW FIELD
   SDL_SetRenderDrawColor(window.renderer, 0x11, 0x11, 0x11, 0xFF);
-  DRAW_RECT.w = 10*block_size;
-  DRAW_RECT.h = 20*block_size;
-  DRAW_RECT.x = frame_x;
-  DRAW_RECT.y = frame_y;
+  DRAW_RECT.w = 10*BLOCK_SIZE;
+  DRAW_RECT.h = 20*BLOCK_SIZE;
+  DRAW_RECT.x = FRAME_X;
+  DRAW_RECT.y = FRAME_Y;
   SDL_RenderFillRect(window.renderer, &DRAW_RECT);
-  DRAW_RECT.w = block_size;
-  DRAW_RECT.h = block_size;
+}
+
+void Game::draw() {
+  draw_frame();
+  DRAW_RECT.w = BLOCK_SIZE;
+  DRAW_RECT.h = BLOCK_SIZE;
   //  DRAW BOARD
   SDL_SetRenderDrawColor(window.renderer, colors[level][0], colors[level][1], colors[level][2], 0xFF);
   for (int y=0;y<20;y++) {
     for (int x=0;x<10;x++) {
       if (board[y][x] > 0) {
-        DRAW_RECT.x = frame_x+(x*block_size);
-        DRAW_RECT.y = frame_y+(y*block_size);
+        DRAW_RECT.x = FRAME_X+(x*BLOCK_SIZE);
+        DRAW_RECT.y = FRAME_Y+(y*BLOCK_SIZE);
         SDL_RenderFillRect(window.renderer, &DRAW_RECT);
+      }
+    }
+  }
+  // DRAW NEXT
+  for (int y=0;y<5;y++) {
+    for (int x=0;x<5;x++) {
+      if (pieces.pieces[next][y][x] > 0) {
+        DRAW_RECT.x = FRAME_X+((11+x)*BLOCK_SIZE);
+        DRAW_RECT.y = FRAME_Y+((2+y)*BLOCK_SIZE);
+        SDL_RenderFillRect(window.renderer, &DRAW_RECT); 
       }
     }
   }
@@ -319,29 +356,45 @@ void Game::draw() {
     if (location[1]+y >= 0) {
       for (int x=0;x<5;x++) {
         if (pieces.current_piece[y][x] > 0) {
-          DRAW_RECT.x = frame_x+((location[0] + x)*block_size);
-          DRAW_RECT.y = frame_y+((location[1] + y)*block_size);
+          DRAW_RECT.x = FRAME_X+((location[0] + x)*BLOCK_SIZE);
+          DRAW_RECT.y = FRAME_Y+((location[1] + y)*BLOCK_SIZE);
           SDL_RenderFillRect(window.renderer, &DRAW_RECT); 
         }
       }
     }
   }
   // DRAW TEXT
-  int text_x = frame_x+(10*block_size)+block_size+2;
-  text.print(window.renderer, "score-", text_x, frame_y);
-  text.print(window.renderer, std::to_string(score), text_x+35, frame_y);
-  text.print(window.renderer, "level-", text_x, frame_y+6);
-  text.print(window.renderer, std::to_string(level), text_x+35, frame_y+6);
-  text.print(window.renderer, "combo-", text_x, frame_y+12);
-  text.print(window.renderer, std::to_string(combo), text_x+35, frame_y+12);
-  text.print(window.renderer, "lines-", text_x, frame_y+18);
-  text.print(window.renderer, std::to_string(lines), text_x+35, frame_y+18);
+  int text_x = FRAME_X+(10*BLOCK_SIZE)+BLOCK_SIZE+2;
+  text.print(window.renderer, "score-", text_x, FRAME_Y);
+  text.print(window.renderer, std::to_string(score), text_x+35, FRAME_Y);
+  text.print(window.renderer, "level-", text_x, FRAME_Y+6);
+  text.print(window.renderer, std::to_string(level), text_x+35, FRAME_Y+6);
+  text.print(window.renderer, "combo-", text_x, FRAME_Y+12);
+  text.print(window.renderer, std::to_string(combo), text_x+35, FRAME_Y+12);
+  text.print(window.renderer, "lines-", text_x, FRAME_Y+18);
+  text.print(window.renderer, std::to_string(lines), text_x+35, FRAME_Y+18);
   window.flip();
 }
 
-void Game::wait(int framerate) {
-  int frame_ticks = cap_timer.get_ticks();
-  if (frame_ticks < 1000/framerate) {
-    SDL_Delay(1000/framerate - frame_ticks);
+void Game::menu() {
+  int block_size = 2;
+  int title_y = FRAME_Y+40;
+  input.read_input();
+  draw_frame();
+  DRAW_RECT.w = block_size;
+  DRAW_RECT.h = block_size;
+  SDL_SetRenderDrawColor(window.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  for (int y=0;y<5;y++){
+    for (int x=0;x<32;x++) {
+      if (TITLE[y][x] > 0) {
+        DRAW_RECT.x = FRAME_X-1+((x+5)*block_size);
+        DRAW_RECT.y = title_y+((y+1)*block_size);
+        SDL_RenderFillRect(window.renderer, &DRAW_RECT); 
+      }
+    }
   }
+  
+  text.print(window.renderer, "press down", FRAME_X+11, title_y+15);
+  window.flip();
+  wait(10);
 }
